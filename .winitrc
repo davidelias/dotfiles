@@ -1,0 +1,14 @@
+export QT_QPA_PLATFORM=wayland
+export QT_QPA_PLATFORMTHEME=qt5ct
+
+export MOZ_ENABLE_WAYLAND=1
+
+export KITTY_ENABLE_WAYLAND=1
+
+export GTK_CSD=0
+export LD_PRELOAD="/usr/lib/libgtk3-nocsd.so.0"
+
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# gammastep -r -t 5900:5900 &
+exec sway
