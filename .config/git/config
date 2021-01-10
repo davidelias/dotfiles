@@ -1,8 +1,8 @@
 [user]
-	name = David Elias
-	email = hello@davidelias.net
+  name = David Elias
+  email = hello@davidelias.net
 [core]
-	editor = nvim
+  editor = nvim
 [init]
   defaultBranch = main
 
@@ -15,4 +15,4 @@
   remote = cyan
 
 [alias]
-	s = status
+  s = status
