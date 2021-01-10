@@ -1,0 +1,18 @@
+[user]
+	name = David Elias
+	email = hello@davidelias.net
+[core]
+	editor = nvim
+[init]
+  defaultBranch = main
+
+[includeIf "gitdir:~/Dev/Work/"]
+  path = ~/Dev/Work/.gitconfig
+
+[color "branch"]
+  current = cyan reverse
+  local = white
+  remote = cyan
+
+[alias]
+	s = status
