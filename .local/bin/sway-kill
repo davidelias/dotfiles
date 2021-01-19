@@ -1,0 +1,11 @@
+#!/bin/sh
+
+FOCUSED_APP=$(swaymsg -t get_tree | jq -r '.. | (.nodes? // empty)[] | select(.focused==true) | .app_id')
+
+# disable sway kill bind
+# for these apps
+APPS=(
+  "kitty"
+)
+
+[[ ! " ${APPS[*]} " =~ " $FOCUSED_APP " ]] && swaymsg kill

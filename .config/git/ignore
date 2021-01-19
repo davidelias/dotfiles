@@ -1,4 +1,6 @@
+.dotfiles.git
+
 .envrc
 .direnvbin
 
-stuff
+_stuff
