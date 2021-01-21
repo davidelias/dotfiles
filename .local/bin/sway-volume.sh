@@ -37,7 +37,7 @@ show_notification () {
   `"</b></span>"
 
   notify-send.sh \
-    --replace-file=/tmp/volume-notification \
+    --replace-file=/tmp/system-notification \
     -c "SYSTEM_NOTIFICATION" \
     -i $icon \
     -t 2000 \

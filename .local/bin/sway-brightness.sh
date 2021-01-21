@@ -26,7 +26,7 @@ show_notification () {
   `"</b></span>"
 
   notify-send.sh \
-    --replace-file=/tmp/brightness-notification \
+    --replace-file=/tmp/system-notification \
     -c "SYSTEM_NOTIFICATION" \
     -i $ICON \
     -t 2000 \
