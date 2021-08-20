@@ -3,4 +3,6 @@
 .envrc
 .direnvbin
 
+.python-version
+
 _stuff

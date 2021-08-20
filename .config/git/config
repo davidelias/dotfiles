@@ -1,8 +1,11 @@
 [user]
 	name = David Elias
 	email = hello@davidelias.net
+
 [core]
   editor = nvim
+  pager = delta
+
 [init]
   defaultBranch = main
 
@@ -16,3 +19,6 @@
 
 [alias]
   s = status
+
+[pull]
+	rebase = true
