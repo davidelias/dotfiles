@@ -30,8 +30,6 @@ export PATH="${GOPATH}/bin:${PATH}"
 
 # defaults and settings
 # ---------------------
-export PROMPT="\n%{$FG[006]%}%~ %{$FG[004]%}->%{$FX[reset]%} "
-# NORMAL_MODE_INDICATOR="%{$FX[italic]$FG[201]%}NORMAL%{$FX[reset]%}"
 export EDITOR="nvim"
 export VISUAL=$EDITOR
 export TERM=xterm-256color
