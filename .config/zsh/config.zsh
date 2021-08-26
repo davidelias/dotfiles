@@ -66,6 +66,9 @@ if ! zgenom saved; then
   zgenom save
 fi
 
+# clean up $PATH
+typeset -U path
+
 # aliases
 # -------
 alias ls="exa --header --group-directories-first"
@@ -77,6 +80,7 @@ alias httpserve='python -m http.server'
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles.git/ --work-tree=$HOME"
 alias speedtest="docker run -it --rm -v $HOME/.config/speedtest:/root/.config/ookla tamasboros/ookla-speedtest speedtest"
 alias zshconfig="${EDITOR} ${ZDOTDIR}/config.zsh"
+alias install="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
 # functions
 # ---------
@@ -86,20 +90,19 @@ open () {
   detach mimeopen -n "$*"
 }
 
-jump() {
-  # cd "$(_z -l 2>&1 | fzf +s --tac --reverse --height 50% --info hidden | sed 's/^[0-9,.]* *//')"
-  cd "$(tmux-sessionizer | fzf +s --tac --reverse --height 50% --info hidden | sed 's/^[0-9,.]* *//')"
-}
-
 # key bindings
 # ------------
 bindkey ^e edit-command-line
-bindkey -s ^p 'jump\n'
 
-# eval init scripts
-# ----------------
+# direnv
+# ------
 _evalcache direnv hook zsh
+
+# LS_COLORS
+# ---------
 _evalcache dircolors ~/.dir_colors
+# export LS_COLORS="$(vivid generate nord)"
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # zsh-history-substring-search
 # ----------------------------
@@ -109,15 +112,33 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=cyan,fg=black'
 export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='bg=red,fg=white'
 
-# prompt
-# ------
-export PROMPT="%{$FG[006]%}%~ %{$FG[004]%}->%{$FX[reset]%} "  # default prompt
-_evalcache starship init zsh
+if [[ -n "$DISPLAY" ]]; then
+
+  # prompt
+  # ------
+  export PROMPT="%{$FG[006]%}%~
+  %{$FG[004]%}->%{$FX[reset]%} "
+
+  # starship prompt
+  _evalcache starship init zsh
+
+else
+
+  # tty prompt
+  # ----------
+  export PROMPT="
+    %{$FG[240]%}%~ %{$FG[232]%}>%{$FX[reset]%} "
+
+  # disable syntax highlight
+  export ZSH_HIGHLIGHT_MAXLENGTH=0
+
+fi
 
 # transient prompt
 # ----------------
-CURRENT_PROMPT=$PROMPT
-TRANSIENT_PROMPT="%{$fg[blue]%}->%{$reset_color%} "
+# https://github.com/romkatv/powerlevel10k/issues/888#issuecomment-657969840
+LONG_PROMPT=$PROMPT
+SHORT_PROMPT="%{$FG[004]%}->%{$FX[reset]%} "
 
 set-long-prompt() {
   # print a newline before the prompt,
@@ -127,12 +148,12 @@ set-long-prompt() {
   elif [[ $prompt_add_newline == true ]]; then
     print ""
   fi
-  PROMPT=$CURRENT_PROMPT
+  PROMPT=$LONG_PROMPT
 }
 
 set-short-prompt() {
-  if [[ $PROMPT != $TRANSIENT_PROMPT ]]; then
-    PROMPT=$TRANSIENT_PROMPT
+  if [[ $PROMPT != $SHORT_PROMPT ]]; then
+    PROMPT=$SHORT_PROMPT
     zle .reset-prompt
   fi
 }
@@ -142,7 +163,36 @@ add-zsh-hook precmd set-long-prompt
 add-zle-hook-widget -Uz zle-line-finish set-short-prompt
 trap 'set-short-prompt; return 130' INT
 
-# clean up $PATH
-typeset -U path
-
 source $XDG_CONFIG_HOME/zsh/colors.zsh
+
+# zle widgets
+# -----------
+
+function fzf-dir {
+  local items=$(find ~ -maxdepth 1 -mindepth 1 -type d)
+  items+=$(find ~/Dev -maxdepth 1 -mindepth 1 -type d)
+  items+=$(find ~/Dev -maxdepth 2 -mindepth 2 -type d)
+  local selected_dir=$(echo -e "$items" | fzf --tac --query "$LBUFFER" --prompt="Directory -> " | sed 's/^[0-9,.]* *//')
+
+  if [ -n "$selected_dir" ]; then
+    BUFFER="cd ${selected_dir}"
+    zle accept-line
+  fi
+  zle reset-prompt
+}
+
+function fzf-ssh () {
+  local selected_host=$(grep "Host " ~/.ssh/config | grep -v '*' | cut -b 6- | fzf --query "$LBUFFER" --prompt="SSH Remote -> ")
+
+  if [ -n "$selected_host" ]; then
+    BUFFER="ssh ${selected_host}"
+    zle accept-line
+  fi
+  zle reset-prompt
+}
+
+zle -N fzf-ssh
+zle -N fzf-dir
+
+bindkey ^p fzf-dir
+bindkey ^s fzf-ssh
