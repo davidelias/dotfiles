@@ -1,0 +1,66 @@
+#!/usr/bin/bash
+
+COMMAND=$1
+ARG1=$2
+
+get_outputs () {
+  swaymsg -t get_outputs | jq -r '.[] | select(.active==true) | .name'
+}
+
+get_focused_output_index () {
+  swaymsg -t get_outputs | jq -r 'map(.focused) | index(true)'
+}
+
+get_output_visible_workspace () {
+  swaymsg -t get_workspaces | jq -r ".[] | select(.visible==true and .output==\"${1}\") | .name | @sh"
+}
+
+get_workspace_name () {
+  echo "$(get_focused_output_index)${1}"
+}
+
+focus () {
+  local name=$(get_workspace_name $1)
+  swaymsg workspace $name
+}
+
+move_to_output () {
+  dir=$1
+  outputs=($(get_outputs))
+  outputs_total=${#outputs[@]}
+  output_focused=$(get_focused_output_index)
+  if [ $dir -gt 0 ]; then
+    outputs_index=$(( ($output_focused + 1) % $outputs_total ))
+  else
+    outputs_index=$(( ($output_focused - 1 + $outputs_total) % $outputs_total ))
+  fi
+  workspace_name=$(get_output_visible_workspace ${outputs[outputs_index]})
+
+  swaymsg move container to workspace $workspace_name
+}
+
+case $COMMAND in
+
+  "focus")
+    focus $ARG1
+  ;;
+
+  "move")
+    swaymsg move container to workspace $(get_workspace_name $ARG1)
+  ;;
+
+  "output")
+    [[ "$ARG1" = "prev" ]] && move_to_output -1
+    [[ "$ARG1" = "next" ]] && move_to_output 1
+  ;;
+
+  "setup")
+    OUTPUTS=($(get_outputs))
+    for (( i=${#OUTPUTS[@]} - 1 ; i >= 0 ; i-- )); do
+      echo "[sway-workspace] setup output - ${OUTPUTS[i]}"
+      swaymsg focus output ${OUTPUTS[i]}
+      focus 1
+    done
+  ;;
+
+esac

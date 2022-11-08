@@ -1,0 +1,170 @@
+{
+    "layer": "bottom",
+    "position": "top",
+    "height": 38,
+    "modules-left": ["sway/workspaces", "sway/mode"],
+    "modules-center": ["clock"],
+    "modules-right": ["custom/screenshare", "custom/screencast", "temperature", "memory", "battery", "pulseaudio#sink", "pulseaudio#source", "tray"],
+    "sway/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": false,
+        "format": "{icon}",
+        "format-icons": {
+            "01": "",
+            "02": "",
+            "03": "",
+            "04": "",
+            "05": "",
+            "11": "",
+            "12": "",
+            "13": "",
+            "focused": "",
+            "default": ""
+        },
+        "persistent_workspaces": {
+          "01": ["eDP-1"],
+          "02": ["eDP-1"],
+          "03": ["eDP-1"],
+          "04": ["eDP-1"],
+          "05": ["eDP-1"],
+          "11": ["DP-1"],
+          "12": ["DP-1"],
+          "13": ["DP-1"]
+        }
+    },
+    "tray": {
+        "icon-size": 22,
+        "spacing": 6
+    },
+    "clock": {
+        "format": "{:%a %b %d • %H:%M}",
+        "tooltip": false,
+        "on-click": "gsimplecal"
+    },
+    "custom/bat0": {
+        "exec": "/home/david/.config/waybar/modules/battery.py BAT0",
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true
+    },
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-full": "",
+        "format-Full": "",
+        "format-charged": "",
+        "format-plugged": "",
+        "format-discharging": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-icons": ["", "", "", "", ""],
+        "interval": 30,
+        "states": {
+            "warning": 20,
+            "critical": 10
+        },
+        "tooltip": true,
+        "on-click": "gnome-power-statistics"
+    },
+    "custom/battery": {
+        "exec": "python battery.py -b BAT0 --format '{icon} {percentage}%' --format-full '' --format-icons ',,,,'",
+        "format": "{text}"
+    },
+    "pulseaudio#sink": {
+        "format": "{icon}",
+        "format-bluetooth-muted": "",
+        "format-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ""
+        },
+        "tooltip-format": "{desc} - {volume}%",
+        "on-click": "sway-volume.sh sink toggle",
+        "on-click-right": "pavucontrol"
+    },
+    "pulseaudio#source": {
+        "format": "{format_source}",
+        "format-source": "",
+        "format-source-muted": "",
+        "tooltip-format": "{source_desc} - {source_volume}%",
+        "on-click": "sway-volume.sh source toggle",
+        "on-click-right": "pavucontrol"
+    },
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["", "", "", ""]
+    },
+    "memory": {
+        "format": " {used:0.1f}G",
+        "states": {
+            "warning": 70,
+            "critical": 90
+        }
+    },
+    "cpu": {
+        "format": " {usage}%",
+        "states": {
+            "warning": 70,
+            "critical": 90
+        }
+    },
+    "temperature": {
+        "format": "{icon} {temperatureC}ºC",
+        "format-icons": ["", "", "", "", ""],
+        "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+        "input-filename": "temp1_input",
+        "on-click": "zenmonitor",
+        "interval": 5
+    },
+    "custom/cpuspeed": {
+      "format": "{icon} {} speed",
+      "format-icons": {
+        "slow": "",
+        "fast": "",
+        "unknown": ""
+      },
+      "return-type": "json",
+      "interval": "once",
+      "exec": "echo '{\"alt\": \"slow\", \"class\": \"slow\", \"tooltip\": \"CPU governor: powersave\"}'"
+    },
+    "custom/fan": {
+      "exec": "waybar-fanspeed",
+      "format": "# {text}",
+      "interval": 5
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "custom/screencast_old": {
+      "format": " REC",
+      "return-type": "json",
+      "interval": 2,
+      "exec": "echo '{\"class\": \"recording\", \"tooltip\": \"Click to stop screen recording\"}'",
+      "exec-if": "pgrep wf-recorder",
+      "on-click": "pkill --signal SIGINT wf-recorder"
+    },
+    "custom/screencast": {
+      "format": " REC",
+      "return-type": "json",
+      "signal": 7,
+      "interval": "once",
+      "exec": "[ -e /tmp/screencast-active ] && echo '{\"class\": \"recording\", \"tooltip\": \"Click to stop screen recording\"}' || echo ''",
+      "on-click": "pkill --signal SIGINT wf-recorder"
+    },
+    "custom/screenshare": {
+      "format": " SHARE",
+      "return-type": "json",
+      "signal": 8,
+      "interval": "once",
+      "exec": "[ -e /tmp/screenshare-active ] && echo '{\"class\": \"sharing\", \"tooltip\": \"Screen share active\"}' || echo ''"
+    }
+
+}
+

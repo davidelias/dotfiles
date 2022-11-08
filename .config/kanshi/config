@@ -1,0 +1,18 @@
+# https://git.hya.sk/skia/swaysome
+# https://github.com/swaywm/sway/issues/4771
+
+profile Laptop {
+  output eDP-1 mode 1920x1080@60.033001Hz position 0,0
+  exec sway-brightness.sh set 15%
+}
+
+profile Home {
+  output eDP-1 mode 1920x1080@60.033001Hz position 0,0
+  output DP-1 mode 2560x1440@59.951000Hz position 1920,0
+  exec sway-brightness.sh set 100%
+}
+
+profile Work {
+  output HDMI-A-1 mode 2560x1080@60.000Hz position 0,0
+  output eDP-1 mode 1920x1080@60.033001Hz position 320,1080
+}

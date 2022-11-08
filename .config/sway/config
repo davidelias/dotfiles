@@ -1,0 +1,379 @@
+### Autostart
+### =========
+
+#exec xrdb -load ~/.Xresources
+#exec kanshi
+
+# Init workspaces for every screen
+exec sway-workspace setup
+
+# ---
+
+exec xsettingsd
+exec mako
+exec ulauncher --no-window-shadow --hide-window
+exec nm-applet --indicator
+exec blueman-applet
+# exec 1password --silent
+# exec 1password --enable-features=UseOzonePlatform --ozone-platform=wayland --silent
+
+exec_always sway-gsettings
+
+exec sway-bootstrap
+
+### Variables
+### =========
+
+# Logo key. Use Mod1 for Alt.
+set $mod Mod4
+set $border 4
+set $term kitty
+set $menu "rofi -combi-modi window,run -show drun -show-icons"
+set $menu2 ulauncher-toggle
+
+# theme colors
+set $nord0 #2E3440
+set $nord1 #3B4252
+set $nord2 #434C5E
+set $nord3 #4C566A
+set $nord4 #D8DEE9
+set $nord5 #E5E9F0
+set $nord6 #ECEFF4
+set $nord16 #20242D
+set $nord9 #81A1C1
+
+### Theme
+### =====
+
+# class                      border    bg        text      indicator    child border
+# ----------------------------------------------------------------------------------
+client.focused               $nord16   $nord16   $nord6    $nord9       $nord16
+client.unfocused             $nord16   $nord16   $nord1    $nord9       $nord16
+client.focused_inactive      $nord16   $nord16   $nord1    $nord9       $nord16
+client.urgent                $nord16   $nord16   $nord9    $nord9       $nord0
+
+font pango:Tex Gyre Heros Regular 10
+#font pango:JetBrains Mono Bold 10
+
+titlebar_border_thickness 0
+titlebar_padding 10 6
+#titlebar_padding 0
+title_align center
+tiling_drag disable
+
+default_border normal $border
+default_floating_border pixel $border
+# smart_gaps on
+# smart_borders on
+hide_edge_borders --i3 none
+gaps inner $border
+
+### Behaviour
+### =========
+
+workspace_layout tabbed
+focus_follows_mouse no
+#floating_maximum_size 1280 x 800
+
+#
+# Application window options
+#
+
+for_window [title="."] title_format "<b>%title</b>"
+
+for_window [app_id=".*Nautilus"] floating enable, border pixel $border
+for_window [app_id="swappy"] floating enable, border pixel $border
+for_window [app_id="pamac-manager"] floating enable, border pixel $border
+for_window [app_id="gnome-disks"] floating enable, border pixel $border
+for_window [app_id="gnome-boxes"] floating enable, border pixel $border
+for_window [app_id="gnome-power-statistics"] floating enable
+for_window [app_id="ambrosio"] floating enable, border pixel 0
+for_window [app_id="ulauncher"] floating enable, border pixel 0
+for_window [app_id="gsimplecal"] floating enable, border pixel $border, move position 835px -10px, resize set width 350px
+for_window [app_id="zenmonitor"] floating enable, border pixel $border
+for_window [app_id="pavucontrol"] floating enable, border pixel $border
+for_window [app_id="subl"] floating enable, border pixel $border
+for_window [app_id="com.github.parnold_x.nasc"] floating enable, border pixel $border
+for_window [app_id="1Password"] floating enable, border pixel $border
+for_window [class="1Password"] floating enable, border pixel $border
+for_window [class="1Password*"] floating enable, border pixel $border
+for_window [app_id="fzf-launcher"] floating enable, border pixel $border, resize set with 350px
+for_window [class="Enpass"] floating enable, border pixel $border
+for_window [app_id="xfce-polkit"] floating enable, border pixel $border
+
+for_window [app_id="firefox" title="Firefox — Sharing Indicator"] floating enable, move position 1780 960
+for_window [app_id="ulauncher"] move up 300
+
+# Application icons
+for_window [app_id="Alacritty"] title_format "<b>%title</b>", border pixel $border
+for_window [app_id="kitty"] title_format "<b>  %title</b>", border pixel $border
+for_window [app_id="firefox"] title_format "  <b>%title</b>", border pixel $border
+for_window [app_id="telegram*"] title_format "  <b>%title</b>", border pixel $border
+for_window [class="Chromium"] title_format "  <b>%title</b>", border pixel $border
+for_window [class="whatsapp*"] title_format "<b>  %title</b>"
+for_window [class="Spotify"] title_format "  <b>%title</b>", border pixel $border
+for_window [app_id="Slack"] title_format "  <b>%title</b>"
+for_window [class="Chromium" title="Slack.*"] title_format "  <b>%title</b> - <small></small>"
+for_window [class="Code"] title_format "<b>  %title</b>", focus, border pixel $border
+for_window [class="Insomnia"] title_format "<b>  %title</b>"
+for_window [class="jetbrains-datagrip"] title_format "<b>  %title | DataGrip</b>"
+for_window [class="jetbrains-datagrip" title="win0"] floating enable
+
+#for_window [name="git ui"] title_format "<b>Cenas</b>"
+
+for_window [workspace="02"] layout default
+
+assign [app_id="firefox"] workspace 02
+assign [app_id="telegram*"] workspace 04
+assign [class="whatsapp*"] workspace 04
+assign [class="Spotify"] workspace 05
+
+### Bar
+### ===
+
+bar {
+    swaybar_command waybar
+}
+
+### Output configuration
+### ====================
+
+set $OUTPUT1 eDP-1
+set $OUTPUT2 DP-1
+
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+output * bg /home/david/Pictures/Wallpapers/forest_trees_fog.jpg fill
+# output * bg /home/david/Pictures/Wallpapers/nord.png fill
+#output * bg /home/david/Pictures/Wallpapers/dark-plants-1920.jpg fill
+
+output * subpixel rgb
+
+#
+# Example configuration:
+#
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+### Idle configuration
+#
+# Example configuration:
+#
+exec swayidle -w \
+  # timeout 300 'swaylock -f -u --screenshot --fade-in 0.5 --effect-pixelate 20' \
+  timeout 300 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+  before-sleep 'swaylock -f -u --screenshot --effect-pixelate 20 --effect-greyscale'
+
+bindsym $mod+Delete exec swaylock -f -u --screenshot --fade-in 0.5 --effect-pixelate 20
+
+
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+
+### Input configuration
+### ===================
+
+# Keyboard
+input "type:keyboard" {
+    xkb_layout pt
+    xkb_model thinkpad
+    xkb_options caps:escape
+    repeat_rate 100
+}
+
+# Touchpad
+input "2:7:SynPS/2_Synaptics_TouchPad" {
+    dwt enabled
+    tap enabled
+    natural_scroll enabled
+    drag disabled
+    accel_profile adaptive
+    pointer_accel 0.3
+}
+
+### Key bindings
+### ============
+
+#
+# Basics:
+#
+
+bindsym $mod+Return exec $term
+bindsym $mod+Shift+Return exec alacritty
+
+# Kill focused window
+bindsym $mod+Shift+q exec sway-kill
+bindsym $mod+Shift+Escape kill
+
+# Start your launcher
+bindsym $mod+Control+Space exec $menu
+Bindsym $mod+Space exec $menu2
+
+bindsym Control+dead_tilde exec 1password --quick-access
+bindsym Control+Alt+dead_tilde exec 1password --toggle
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
+
+# Reload the configuration file
+bindsym $mod+Shift+c reload
+
+# Exit sway (logs you out of your Wayland session)
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+
+#
+# Moving around:
+#
+
+# Move your focus around
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move the focused window with the same, but add Shift
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+#
+# Workspaces:
+#
+
+# Switch to workspace
+bindsym $mod+1 exec sway-workspace focus 1
+bindsym $mod+2 exec sway-workspace focus 2
+bindsym $mod+3 exec sway-workspace focus 3
+bindsym $mod+4 exec sway-workspace focus 4
+bindsym $mod+5 exec sway-workspace focus 5
+bindsym $mod+6 exec sway-workspace focus 6
+
+# Move focused container to workspace
+bindsym $mod+Shift+1 exec sway-workspace move 1
+bindsym $mod+Shift+2 exec sway-workspace move 2
+bindsym $mod+Shift+3 exec sway-workspace move 3
+bindsym $mod+Shift+4 exec sway-workspace move 4
+bindsym $mod+Shift+5 exec sway-workspace move 5
+bindsym $mod+Shift+6 exec sway-workspace move 6
+
+# Move focused container to next output
+bindsym $mod+o exec sway-workspace output next
+
+# Move focused container to previous output
+bindsym $mod+Shift+Backslash exec sway-workspace output next
+
+# Cycle workspaces
+bindsym $mod+Tab workspace next
+
+bindsym Alt+tab exec sway-switcher
+
+bindsym $mod+Control+Left focus output left
+bindsym $mod+Control+Right focus output right
+bindsym $mod+Backslash focus output right
+
+#
+# Layout stuff:
+#
+
+# You can "split" the current object of your focus with
+# $mod+b or $mod+v, for horizontal and vertical splits
+# respectively.
+bindsym $mod+b splith
+bindsym $mod+v splitv
+
+# Switch the current container between different layout styles
+#bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout splith
+
+# Make the current focus fullscreen
+bindsym $mod+f fullscreen
+
+# Toggle the current focus between tiling and floating mode
+bindsym $mod+Shift+space floating toggle
+
+# Swap focus between the tiling area and the floating area
+#bindsym $mod+space focus mode_toggle
+
+# Move focus to the parent container
+bindsym $mod+a focus parent
+
+#
+# Scratchpad:
+#
+# Sway has a "scratchpad", which is a bag of holding for windows.
+# You can send windows there and get them back later.
+
+# Move the currently focused window to the scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+bindsym $mod+minus scratchpad show
+
+#
+# Resizing containers:
+#
+
+set $mode_resize Resize
+mode "$mode_resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "$mode_resize"
+
+#
+# Special keys
+#
+
+bindsym XF86MenuKB exec sway-screenshot
+
+# Audio keys
+bindsym XF86AudioRaiseVolume exec sway-volume.sh sink up
+bindsym XF86AudioLowerVolume exec sway-volume.sh sink down
+bindsym XF86AudioMute exec sway-volume.sh sink toggle
+
+bindsym XF86AudioRaiseVolume+Shift exec sway-volume.sh source up
+bindsym XF86AudioLowerVolume+Shift exec sway-volume.sh source down
+bindsym XF86AudioMicMute exec sway-volume.sh source toggle
+bindsym XF86AudioMute+Shift exec sway-volume.sh source toggle
+
+#bindsym XF86Favorites exec playerctl play-pause
+bindsym $mod+p exec playerctl -p spotify play-pause
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioPause exec playerctl play-pause
+bindsym XF86AudioPrev exec playerctl previous
+bindsym XF86AudioNext exec playerctl next
+
+# Display backlight keys
+#bindsym XF86MonBrightnessUp exec brightnessctl s +5%
+#bindsym XF86MonBrightnessDown exec brightnessctl s 5%-
+bindsym XF86MonBrightnessUp exec sway-brightness.sh up
+bindsym XF86MonBrightnessDown exec sway-brightness.sh down
+
+# Screenshots / Screencast
+bindsym $mod+Print exec sway-screenshot
+bindsym $mod+Shift+Print exec sway-screenshot --record
+
+#bindsym XF86WLan exec wifi-toggle.sh
+
+exec_always pkill kanshi; exec kanshi
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+# exec /usr/bin/lxpolkit
+
