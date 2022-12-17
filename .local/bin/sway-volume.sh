@@ -1,12 +1,9 @@
 #!/bin/sh
 
+source $HOME/functions.sh
+
 DEVICE=$1
 COMMAND=$2
-
-ICON_VOLUME="$HOME/.local/share/icons/volume-$DEVICE.svg"
-ICON_MUTED="$HOME/.local/share/icons/volume-$DEVICE-muted.svg"
-SYMBOL_FULL=' '
-SYMBOL_EMPTY=$SYMBOL_FULL
 
 function mixer () {
   args=()
@@ -14,51 +11,49 @@ function mixer () {
   pamixer "${args[@]}" "$@"
 }
 
-MUTED=$(mixer --get-mute)
-
 show_notification () {
-  volume=$(mixer --get-volume)
   muted=$(mixer --get-mute)
+  icon="volume-$DEVICE"
 
-  full=""
-  empty=""
-  icon=$ICON_VOLUME
+  [[ "$muted" = "true" ]] && volume=0 || volume=$(mixer --get-volume)
+  [[ "$muted" = "true" ]] && icon+="-muted"
+  [[ "$muted" = "true" ]] && micmute_led_state=1 || micmute_led_state=0
+  [[ $DEVICE = "source" ]] && brightnessctl -d "platform::micmute" s $micmute_led_state
 
-  full_size=$(( volume / 10 ))
-  empty_size=$(( 10 - full_size ))
-
-  if [ "$muted" = "true" ]; then empty_size=10; icon=$ICON_MUTED; fi
-  if [ "$full_size" -gt 0 ] && [ "$muted" = "false" ]; then full=$(printf "${SYMBOL_FULL}%.0s" $(seq $full_size)); fi
-  if [ "$empty_size" -gt 0 ]; then empty=$(printf "${SYMBOL_EMPTY}%.0s" $(seq $empty_size)); fi
-
-  message="<span font='13'><b>"`
-    `"<span foreground='#e5e9f0'>${full}</span>"`
-    `"<span foreground='#3b4252'>${empty}</span>"`
-  `"</b></span>"
+  progress=$(progress_bar \
+    value=$volume \
+    steps=5 \
+    symbol_full=" " \
+    symbol_empty=" " \
+    format="<span font='7' font_family='Font Awesome 5 Pro'><b>"`
+      `"<span foreground='#e5e9f0'>%{full}</span>"`
+      `"<span foreground='#3b4252'>%{empty}</span>"`
+    `"</b></span>")
 
   notify-send.sh \
-    --replace-file=/tmp/system-notification \
-    -c "SYSTEM_NOTIFICATION" \
-    -i $icon \
+    -R /tmp/system-notification \
+    -c "desktop.adjust" \
     -t 2000 \
+    -i $icon \
     "Volume ${volume}%" \
-    "${message}"
+    "${progress}"
+
 }
 
 case $COMMAND in
 
   "up")
-    [[ "$MUTED" = "false" ]] && mixer -i 5
+    mixer --unmute --increase 5
     show_notification
     ;;
 
   "down")
-    [[ "$MUTED" = "false" ]] && mixer -d 5
+    mixer --unmute --decrease 5
     show_notification
     ;;
 
   "toggle")
-    mixer -t
+    mixer --toggle-mute
     show_notification
     ;;
 
